@@ -1,6 +1,10 @@
 ::ModBetterLocationTooltips.TooltipHelper <- {
     function processTooltip(tooltip) {
 
+        if (::ModBetterLocationTooltips.MergeNamedEnemies == false) {
+            return tooltip;
+        }
+
         // Iterate through the tooltip entries and group them by icon and text
         local groupedEntities = {};
         foreach(index, entry in tooltip) {
