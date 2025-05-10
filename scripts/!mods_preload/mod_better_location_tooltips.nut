@@ -3,7 +3,7 @@
 	Name = "Better Location Tooltips",
 	Version = "1.0.0",
 	Enabled = true
-	MergeNamedEnemies = true,
+	MergeNamedEnemies = false,
 };
 
 ::ModBetterLocationTooltips.HooksMod <- ::Hooks.register(::ModBetterLocationTooltips.ID, ::ModBetterLocationTooltips.Version, ::ModBetterLocationTooltips.Name);
@@ -30,9 +30,9 @@
 	page.addDivider("divider");
 	local settingMergeNamedEnemies = page.addBooleanSetting(
 		"MergeNamedEnemies",
-		true,
-		"Merge Named Enemies",
-		"When enabled, ennemy champions with unique names will be merged together. For example, 'The Mountain' and 'The Scourge' become '2 [color=800808]Champion[/color] Hedge Knights'."
+		false,
+		"Merge Named Enemies (Experimental)",
+		"When enabled, ennemy champions with unique names will be merged together. For example, 'The Mountain' and 'The Scourge' become '2 [color=800808]Champion[/color] Hedge Knights'. This may not work properly when plurals are involved (eg. Billman vs Billmen, A Wardog vs Wardog)."
 	);
 	settingMergeNamedEnemies.addCallback(function(_value) {
 		::ModBetterLocationTooltips.MergeNamedEnemies = _value;
