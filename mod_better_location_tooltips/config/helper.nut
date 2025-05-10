@@ -1,7 +1,7 @@
 ::ModBetterLocationTooltips.TooltipHelper <- {
     function processTooltip(tooltip) {
 
-        if (::ModBetterLocationTooltips.MergeNamedEnemies == false) {
+        if (::ModBetterLocationTooltips.Enabled == false) {
             return tooltip;
         }
 
