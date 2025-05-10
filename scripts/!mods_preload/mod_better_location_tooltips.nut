@@ -2,7 +2,7 @@
 	ID = "mod_better_location_tooltips",
 	Name = "Better Location Tooltips",
 	Version = "1.0.0",
-	CollapseNamedEnemies = true,
+	MergeNamedEnemies = true,
 };
 
 ::ModBetterLocationTooltips.HooksMod <- ::Hooks.register(::ModBetterLocationTooltips.ID, ::ModBetterLocationTooltips.Version, ::ModBetterLocationTooltips.Name);
@@ -17,18 +17,18 @@
 
 	// MSU config page
 	local page = ::ModBetterLocationTooltips.Mod.ModSettings.addPage("Better Location Tooltips");
-	page.addTitle("title", "You can tweak how location tooltips appear in game.");
-	page.addDivider("divider");
-	local settingCollapseNamedEnemies = page.addBooleanSetting(
-		"CollapseNamedEnemies",
+	local settingMergeNamedEnemies = page.addBooleanSetting(
+		"MergeNamedEnemies",
 		true,
-		"Collapse Named Enemies",
-		"When enabled, ennemy champions with unique names will be merged together."
+		"Merge Named Enemies",
+		"When enabled, ennemy champions with unique names will be merged together. For example, 'The Mountain' and 'The Scourge' become '2 [color=800808]Champion[/color] Hedge Knights'."
 	);
-	settingCollapseNamedEnemies.addCallback(function(_value) {
-		::ModBetterLocationTooltips.CollapseNamedEnemies = _value;
+	settingMergeNamedEnemies.addCallback(function(_value) {
+		::ModBetterLocationTooltips.MergeNamedEnemies = _value;
 	});
 
+	::include("mod_better_location_tooltips/config/helper");
 	::include("mod_better_location_tooltips/hooks/location");
+	::include("mod_better_location_tooltips/hooks/party");
 
 }, ::Hooks.QueueBucket.Normal);
