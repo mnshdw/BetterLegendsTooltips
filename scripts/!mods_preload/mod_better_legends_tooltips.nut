@@ -32,8 +32,8 @@
 	local settingMergeNamedEnemies = page.addBooleanSetting(
 		"MergeNamedEnemies",
 		false,
-		"(EXPERIMENTAL) Merge Named Enemies",
-		"When enabled, ennemy champions with unique names will be merged together. For example, 'The Mountain' and 'The Scourge' become '2 [color=800808]Champion[/color] Hedge Knights'. This may not work properly when plurals are involved (eg. Billman vs Billmen, A Wardog vs Wardog). Report any issue you see."
+		"Merge Named Enemies ",
+		"When enabled, ennemy champions with unique names will be merged together. For example, 'The Mountain' and 'The Scourge' should become '2 [color=800808]Champion[/color] Hedge Knights'. This may not work properly when plurals are involved (eg. Billman vs Billmen, A Wardog vs Wardog). Report any issue you see."
 	);
 	settingMergeNamedEnemies.addCallback(function(_value) {
 		::ModBetterLegendsTooltips.MergeNamedEnemies = _value;
