@@ -5,9 +5,18 @@
 			return tooltip;
 		}
 
-		// Special case: if tooltip has only one entry with text "Unknown garrison", return it untouched
-		if (tooltip.len() == 1 && "type" in tooltip[0] && tooltip[0].type == "text" && "text" in tooltip[0] && tooltip[0].text == "Unknown garrison") {
-			return tooltip;
+        ::logInfo("tooltip.len(): " + tooltip.len());
+
+		// Special case: if tooltip has only one text entry with "Unknown garrison", return it untouched.
+        // Usually the layout looks like this:
+        // - type=title, text=Artifact Reliquary
+        // - type=description, text=A collapsed ruin from days long past etc
+        // - type=text, text=Unknown garrison
+        // - type=hint, text=This location is on plains
+            foreach(index, entry in tooltip) {
+                if ("type" in entry && entry.type == "text" && "text" in entry && entry.text == "Unknown garrison") {
+                    return tooltip;
+            }
 		}
 
 		// Iterate through the tooltip entries and group them by icon and text
