@@ -5,18 +5,30 @@
 			return tooltip;
 		}
 
-        ::logInfo("tooltip.len(): " + tooltip.len());
-
 		// Special case: if tooltip has only one text entry with "Unknown garrison", return it untouched.
-        // Usually the layout looks like this:
-        // - type=title, text=Artifact Reliquary
-        // - type=description, text=A collapsed ruin from days long past etc
-        // - type=text, text=Unknown garrison
-        // - type=hint, text=This location is on plains
-            foreach(index, entry in tooltip) {
-                if ("type" in entry && entry.type == "text" && "text" in entry && entry.text == "Unknown garrison") {
-                    return tooltip;
-            }
+		// Usually the layout looks like this:
+		// - type=title, text=Artifact Reliquary
+		// - type=description, text=A collapsed ruin from days long past etc
+		// - type=text, text=Unknown garrison
+		// - type=hint, text=This location is on plains
+		foreach(index, entry in tooltip) {
+			if ("type" in entry && entry.type == "text" && "text" in entry && entry.text == "Unknown garrison") {
+				return tooltip;
+			}
+		}
+
+		// Usually ennemy troops have a "quantifier" prefix that indicates how many of them are there.
+		// Depending on Legends setting "Exact engagement numbers", this prefix can be a number or a word,
+		// for example:
+		// - "A Desert Stalker"
+		// - "Some Orc Warriors"
+		// - "6 Barbarian Chosen"
+		// We detect champions by checking that the name of the entity does *not* start with such quantifiers.
+
+		// First create a list of all quantifier prefixes
+		local quantifiers = ["A ", "An "];
+		foreach(key, value in ::Const.Strings.EngageEnemyNumbersNames) {
+			quantifiers.push(value + " ");
 		}
 
 		// Iterate through the tooltip entries and group them by icon and text
@@ -24,14 +36,14 @@
 		foreach(index, entry in tooltip) {
 			if ("type" in entry && entry.type == "text" && "text" in entry && "icon" in entry) {
 				local baseName = entry.text;
-				local isChampion = true;
+				local isChampion = false;
+				local hasQuantifier = false;
 
-				// Check if the entity name starts with a number or pronoun (A/An)
 				if (baseName.len() > 0) {
+
+					// Check if the name starts with a number followed by space
 					local numberEndPos = 0;
 					local hasLeadingNumber = false;
-
-					// Find where the number ends (if any)
 					for (local i = 0; i < baseName.len(); i++) {
 						local c = baseName.slice(i, i + 1);
 						if (c == "0" || c == "1" || c == "2" || c == "3" || c == "4" ||
@@ -43,13 +55,21 @@
 						}
 					}
 
-					// Check if the number is followed by a space
 					if (hasLeadingNumber && numberEndPos < baseName.len() && baseName.slice(numberEndPos, numberEndPos + 1) == " ") {
-						isChampion = false;
-					} else if (baseName.len() >= 2 && baseName.slice(0, 2) == "A ") {
-						isChampion = false;
-					} else if (baseName.len() >= 3 && baseName.slice(0, 3) == "An ") {
-						isChampion = false;
+						hasQuantifier = true;
+					} else {
+						// Check for all quantifiers from our list
+						foreach(prefix in quantifiers) {
+							if (baseName.len() >= prefix.len() && baseName.slice(0, prefix.len()) == prefix) {
+								hasQuantifier = true;
+								break;
+							}
+						}
+					}
+
+					// If there's no quantifier, it's a champion
+					if (!hasQuantifier) {
+						isChampion = true;
 					}
 				}
 
@@ -90,11 +110,15 @@
 		local newTooltip = [];
 		foreach(key, group in groupedEntities) {
 			local entry = group.entry;
+            local count = group.count;
 			if (group.count > 1) {
-				entry.text = group.count + (group.isChampion ? " [color=800808]Champion[/color] " : " ") + entry.text;
+                if (!::Legends.Mod.ModSettings.getSetting("ExactEngageNumbers").getValue()) {
+                    count = getEngagementNumbersName(count);
+                }
+				entry.text = count + (group.isChampion ? " [color=800808]Champion[/color] " : " ") + entry.text;
 			} else if (group.isChampion) {
-                entry.text = "[color=800808]Champion[/color] " + entry.text;
-            }
+				entry.text = "[color=800808]Champion[/color] " + entry.text;
+			}
 			newTooltip.push(entry);
 		}
 
@@ -119,5 +143,13 @@
 		}
 
 		return newTooltip;
+	}
+
+	function getEngagementNumbersName(count) {
+		foreach(key, value in ::Const.Strings.EngageEnemyNumbers) {
+			if (count >= value[0] && count <= value[1]) {
+				return ::Const.Strings.EngageEnemyNumbersNames[key];
+			}
+		}
 	}
 }
