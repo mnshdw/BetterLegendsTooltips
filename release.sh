@@ -1,3 +1,3 @@
 #!/bin/bash
-zip -r mod_better_location_tooltips.zip . -x 'release.sh' -x '*.git*'
+zip -r mod_better_legends_tooltips.zip . -x 'release.sh' -x '*.git*'
 

@@ -1,7 +1,7 @@
-::ModBetterLocationTooltips.TooltipHelper <- {
+::ModBetterLegendsTooltips.TooltipHelper <- {
     function processTooltip(tooltip) {
 
-        if (::ModBetterLocationTooltips.Enabled == false) {
+        if (::ModBetterLegendsTooltips.Enabled == false) {
             return tooltip;
         }
 
@@ -12,7 +12,7 @@
                 local baseName = entry.text;
 
                 // If MergeNamedEnemies is enabled, determine the base name of the entity
-                if (::ModBetterLocationTooltips.MergeNamedEnemies && "icon" in entry && typeof entry.icon == "string") {
+                if (::ModBetterLegendsTooltips.MergeNamedEnemies && "icon" in entry && typeof entry.icon == "string") {
                     // Extract the entity ID from the icon
                     local lastSlash = entry.icon.find("/");
                     while (lastSlash != null) {

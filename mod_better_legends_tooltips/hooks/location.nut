@@ -1,4 +1,4 @@
-::ModBetterLocationTooltips.HooksMod.hook("scripts/entity/world/location", function(q) {
+::ModBetterLegendsTooltips.HooksMod.hook("scripts/entity/world/location", function(q) {
 	q.getTooltip = @(__original) function() {
 		local tooltip = __original();
 
@@ -7,6 +7,6 @@
 			this.m.IsShowingDefenders = true;
 		}
 
-		return ::ModBetterLocationTooltips.TooltipHelper.processTooltip(tooltip);
+		return ::ModBetterLegendsTooltips.TooltipHelper.processTooltip(tooltip);
 	};
 });
