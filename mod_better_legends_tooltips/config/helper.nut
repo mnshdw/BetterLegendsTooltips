@@ -5,6 +5,11 @@
 			return tooltip;
 		}
 
+		// Special case: if tooltip has only one entry with text "Unknown garrison", return it untouched
+		if (tooltip.len() == 1 && "type" in tooltip[0] && tooltip[0].type == "text" && "text" in tooltip[0] && tooltip[0].text == "Unknown garrison") {
+			return tooltip;
+		}
+
 		// Iterate through the tooltip entries and group them by icon and text
 		local groupedEntities = {};
 		foreach(index, entry in tooltip) {
