@@ -7,7 +7,7 @@ This mod attempts to improve some tooltip issues commonly seen in Legends, and i
 This mod shortens location and enemy party tooltips by merging multiple enemy champions of the same type into a single group.
 
 If you prefer to keep unique champion names intact, the mod has an option called "Merge Named Enemies" that can be toggled on and off.
-After all, "Despicable Dick" is more immersive than "Champion Sellsword Veteran: ;)
+After all, "Despicable Dick" is more immersive than "Champion Sellsword Veteran" ;)
 
 Here's an example with all 3 cases:
 
