@@ -10,7 +10,7 @@
 
 ::ModBetterLegendsTooltips.HooksMod.require("mod_msu >= 1.2.7", "mod_modern_hooks >= 0.5.4");
 
-::ModBetterLegendsTooltips.HooksMod.queue(">mod_msu", function() {
+::ModBetterLegendsTooltips.HooksMod.queue(">mod_msu", ">mod_legends", ">mod_sellswords", ">mod_ROTUC", function() {
 	::ModBetterLegendsTooltips.Mod <- ::MSU.Class.Mod(::ModBetterLegendsTooltips.ID, ::ModBetterLegendsTooltips.Version, ::ModBetterLegendsTooltips.Name);
 
 	// Register with MSU so people know to update
