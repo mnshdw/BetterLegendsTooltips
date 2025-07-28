@@ -1,4 +1,4 @@
-::ModBetterLegendsTooltips.TooltipHelper <- {
+::ModBetterLegendsTooltips.Helper <- {
 	function processTooltip(tooltip) {
 
 		if (::ModBetterLegendsTooltips.Enabled == false) {
@@ -17,6 +17,65 @@
 			}
 		}
 
+		// Extract text entries with icons
+		local textEntries = [];
+		foreach(index, entry in tooltip) {
+			if ("type" in entry && entry.type == "text" && "text" in entry && "icon" in entry) {
+				textEntries.push(entry);
+			}
+		}
+
+		local processedEntries = processEntityGroup(
+			textEntries,
+			function(entry) { return entry.icon; },
+			function(entry) { return entry.text; },
+			function(entry, newText) { entry.text = newText; },
+			function(entry) { return "icon" in entry && typeof entry.icon == "string"; },
+			true
+		);
+
+		// Build new tooltip with processed entries and non-text entries
+		local newTooltip = [];
+		foreach(entry in processedEntries) {
+			newTooltip.push(entry);
+		}
+
+		// Add non-text entries back to the tooltip
+		foreach(index, entry in tooltip) {
+			if (!("type" in entry && entry.type == "text" && "text" in entry && "icon" in entry)) {
+				newTooltip.push(entry);
+			}
+		}
+
+		return newTooltip;
+	}
+
+	function processWorldCombatDialog(_entities) {
+
+		if (::ModBetterLegendsTooltips.Enabled == false) {
+			return _entities;
+		}
+
+		// Extract entities with Icon and Name
+		local entities = [];
+		foreach(index, entry in _entities) {
+			if ("Icon" in entry && "Name" in entry) {
+				entities.push(entry);
+			}
+		}
+
+		return processEntityGroup(
+			entities,
+			function(entry) { return entry.Icon; },
+			function(entry) { return entry.Name; },
+			function(entry, newName) { entry.Name = newName; },
+			function(entry) { return "Overlay" in entry && typeof entry.Overlay == "string" && entry.Overlay == "icons/miniboss.png"; },
+			false // World combat dialog doesn't use XBBCODE (yet) so colors don't work
+		);
+	}
+
+	function processEntityGroup(entities, getIcon, getName, setName, isChampionFn, useColorFormatting = true) {
+
 		// Usually ennemy troops have a "quantifier" prefix that indicates how many of them are there.
 		// Depending on Legends setting "Exact engagement numbers", this prefix can be a number or a word,
 		// for example:
@@ -31,11 +90,20 @@
 			quantifiers.push(value + " ");
 		}
 
-		// Iterate through the tooltip entries and group them by icon and text
+		// Entries look like this:
+		// Entry #0 key=Icon, value=slave_orientation
+		// Entry #0 key=Overlay, value=(null : 0x00000000)
+		// Entry #0 key=Name, value=2 Indebted
+
+		// Iterate through the entries and group them by icon and name
 		local groupedEntities = {};
-		foreach(index, entry in tooltip) {
-			if ("type" in entry && entry.type == "text" && "text" in entry && "icon" in entry) {
-				local baseName = entry.text;
+		foreach(index, entity in entities) {
+			local icon = getIcon(entity);
+			local baseName = getName(entity);
+
+			::logInfo("Processing entity: baseName=" + (baseName != null ? icon : "null") + " icon=" + (icon != null ? icon : "null"));
+
+			if (icon != null && baseName != null) {
 				local isChampion = false;
 				local hasQuantifier = false;
 
@@ -73,76 +141,108 @@
 					}
 				}
 
+				// Override champion detection if provided (but only for merging logic)
+				local shouldMergeNames = ::ModBetterLegendsTooltips.MergeNamedEnemies && isChampionFn(entity);
+
 				// If MergeNamedEnemies is enabled, try to determine the base name of the entity
-				if (::ModBetterLegendsTooltips.MergeNamedEnemies && "icon" in entry && typeof entry.icon == "string" && isChampion) {
-					// Extract the entity ID from the icon
-					local lastSlash = entry.icon.find("/");
-					while (lastSlash != null) {
-						local nextSlash = entry.icon.find("/", lastSlash + 1);
-						if (nextSlash == null) break;
-						lastSlash = nextSlash;
+				if (::ModBetterLegendsTooltips.MergeNamedEnemies && (isChampion || shouldMergeNames)) {
+					local iconName = icon;
+
+					// Extract the entity ID from the icon path
+					// This has to work for both tooltip icons (which contain a path like
+					// "ui/orientation/orc_03_orientation.png") and world combat dialog icons
+					// (which only contain the entity ID like "orc_03_orientation").
+					if (typeof icon == "string") {
+						local lastSlash = icon.find("/");
+						while (lastSlash != null) {
+							local nextSlash = icon.find("/", lastSlash + 1);
+							if (nextSlash == null) {
+								break;
+							}
+							lastSlash = nextSlash;
+						}
+
+						if (lastSlash != null) {
+							local lastDot = icon.find(".", lastSlash);
+							if (lastDot != null) {
+								iconName = icon.slice(lastSlash + 1, lastDot);
+							} else {
+								iconName = icon.slice(lastSlash + 1);
+							}
+						} else {
+							local lastDot = icon.find(".");
+							if (lastDot != null) {
+								iconName = icon.slice(0, lastDot);
+							} else {
+								iconName = icon;
+							}
+						}
 					}
-					local lastDot = entry.icon.find(".", lastSlash);
-					local iconName = entry.icon.slice(lastSlash + 1, lastDot);
 
 					local entityIndex = ::Const.EntityIcon.find(iconName);
 					if (entityIndex != null && entityIndex in ::Const.Strings.EntityName) {
 						baseName = ::Const.Strings.EntityName[entityIndex];
-						entry.text = baseName;
+						setName(entity, baseName);
 					}
 				}
 
 				// Group by icon and base name
-				local key = entry.icon + "|" + baseName + "|" + (isChampion ? "champion" : "normal");
+				local key = icon + "|" + baseName + "|" + (isChampion ? "champion" : "normal");
+				::logInfo("key=" + key);
 				if (key in groupedEntities) {
 					groupedEntities[key].count++;
 				} else {
 					groupedEntities[key] <- {
 						count = 1,
-						entry = entry,
+						entity = entity,
 						isChampion = isChampion
 					};
 				}
 			}
 		}
 
-		// Clear the tooltip and rebuild it with grouped entries
-		local newTooltip = [];
+		// Build result array with grouped entities
+		local result = [];
 		foreach(key, group in groupedEntities) {
-			local entry = group.entry;
-            local count = group.count;
+			local entity = group.entity;
+			local count = group.count;
+			local currentName = getName(entity);
+
 			if (group.count > 1) {
-                if (!::Legends.Mod.ModSettings.getSetting("ExactEngageNumbers").getValue()) {
-                    count = getEngagementNumbersName(count);
-                }
-				entry.text = count + (group.isChampion ? " [color=800808]Champion[/color] " : " ") + entry.text;
+				if (!::Legends.Mod.ModSettings.getSetting("ExactEngageNumbers").getValue()) {
+					count = getEngagementNumbersName(count);
+				}
+				local championLabel = group.isChampion ? (useColorFormatting ? " [color=800808]Champion[/color] " : " Champion ") : " ";
+				setName(entity, count + championLabel + currentName);
 			} else if (group.isChampion) {
-				entry.text = "[color=800808]Champion[/color] " + entry.text;
+				local championLabel = useColorFormatting ? "[color=800808]Champion[/color] " : "Champion ";
+				setName(entity, championLabel + currentName);
 			}
-			newTooltip.push(entry);
+			result.push(entity);
 		}
 
 		// Sort the entries by icon and ensure non-champions come before champions
-		newTooltip.sort(function(a, b) {
-			if ("icon" in a && "icon" in b) {
-				if (a.icon == b.icon) {
-					local aIsChampion = a.text.find("Champion[/color]") != null;
-					local bIsChampion = b.text.find("Champion[/color]") != null;
+		result.sort(function(a, b) {
+			local iconA = getIcon(a);
+			local iconB = getIcon(b);
+			if (iconA != null && iconB != null) {
+				if (iconA == iconB) {
+					local nameA = getName(a);
+					local nameB = getName(b);
+					local aIsChampion = nameA.find("Champion[/color]") != null || nameA.find("Champion ") != null;
+					local bIsChampion = nameB.find("Champion[/color]") != null || nameB.find("Champion ") != null;
 					return aIsChampion && !bIsChampion ? 1 : (!aIsChampion && bIsChampion ? -1 : 0);
 				}
-				return a.icon < b.icon ? -1 : (a.icon > b.icon ? 1 : 0);
+				return iconA < iconB ? -1 : (iconA > iconB ? 1 : 0);
 			}
 			return 0;
 		});
 
-		// Add non-text entries back to the tooltip
-		foreach(index, entry in tooltip) {
-			if (!("type" in entry && entry.type == "text" && "text" in entry && "icon" in entry)) {
-				newTooltip.push(entry);
-			}
+		for (local i = 0; i < result.len(); i++) {
+			::logInfo("Result entity " + i + ": " + getName(result[i]) + " (" + getIcon(result[i]) + ")");
 		}
 
-		return newTooltip;
+		return result;
 	}
 
 	function getEngagementNumbersName(count) {

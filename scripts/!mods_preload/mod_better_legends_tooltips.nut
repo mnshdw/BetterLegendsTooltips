@@ -42,5 +42,6 @@
 	::include("mod_better_legends_tooltips/config/helper");
 	::include("mod_better_legends_tooltips/hooks/location");
 	::include("mod_better_legends_tooltips/hooks/party");
+	::include("mod_better_legends_tooltips/hooks/ui/screens/world/world_combat_dialog");
 
 }, ::Hooks.QueueBucket.Normal);

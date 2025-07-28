@@ -7,6 +7,6 @@
 			this.m.IsShowingDefenders = true;
 		}
 
-		return ::ModBetterLegendsTooltips.TooltipHelper.processTooltip(tooltip);
+		return ::ModBetterLegendsTooltips.Helper.processTooltip(tooltip);
 	};
 });

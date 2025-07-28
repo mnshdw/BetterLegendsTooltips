@@ -3,6 +3,6 @@
 	q.getTooltip = @(__original) function() {
 		local tooltip = __original();
 
-		return ::ModBetterLegendsTooltips.TooltipHelper.processTooltip(tooltip);
+		return ::ModBetterLegendsTooltips.Helper.processTooltip(tooltip);
 	};
 });
