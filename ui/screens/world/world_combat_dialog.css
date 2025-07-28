@@ -1,0 +1,188 @@
+/*
+ *  @Project:		Battle Brothers
+ *	@Company:		Overhype Studios
+ *
+ *	@Copyright:		(c) Overhype Studios | 2013 - 2020
+ *
+ *  @Author:		Overhype Studios
+ *  @Date:			08.10.2017
+ *  @Description:	Combat Dialog Module CSS
+ */
+
+.world-combat-dialog {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 2;
+
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+.world-combat-dialog > .l-dialog-container {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 80rem;
+  height: 72rem;
+  position: absolute;
+  margin: auto;
+  z-index: 2;
+  overflow: visible;
+}
+
+.world-combat-dialog > .l-dialog-container .content {
+  padding: 0.6rem;
+  padding-left: 10rem;
+  overflow: visible;
+}
+
+.world-combat-dialog > .l-dialog-container .content .image-row {
+  width: 100%;
+  position: relative;
+  float: left;
+}
+
+.world-combat-dialog > .l-dialog-container .content .terrain-image {
+  margin: auto;
+}
+
+.world-combat-dialog > .l-dialog-container .right-column {
+  left: 5.5rem;
+  width: 48rem;
+  position: relative;
+  float: left;
+  height: 60rem;
+  overflow: visible;
+}
+
+.world-combat-dialog > .l-dialog-container .right-column .entity-list-container {
+  width: 100%;
+  height: 39rem;
+  position: relative;
+  margin-top: 1rem;
+  clear: both;
+}
+
+.world-combat-dialog > .l-dialog-container .right-column .entity-list-container .scroll-container {
+  margin-bottom: 1rem;
+}
+
+.world-combat-dialog > .l-dialog-container .content .ally-banners {
+  left: 0rem;
+  top: 0rem;
+  width: 18.8rem;
+  height: 100%;
+  position: absolute;
+}
+
+.world-combat-dialog > .l-dialog-container .content .enemy-banners {
+  right: 0rem;
+  top: 0rem;
+  width: 18.8rem;
+  height: 100%;
+  position: absolute;
+}
+
+.world-combat-dialog > .l-dialog-container .content .banner {
+  width: 18.8rem;
+  height: 30.1rem;
+  position: relative;
+  float: left;
+  margin-top: -13rem;
+}
+
+.world-combat-dialog > .l-dialog-container .content .banner:first-child {
+  margin-top: -10rem;
+}
+
+.world-combat-dialog > .l-dialog-container .right-column .title-label {
+  top: 1rem;
+  bottom: 0rem;
+  width: 100%;
+  position: relative;
+  float: left;
+  clear: left;
+  margin-bottom: 2rem;
+
+  text-align: center;
+}
+
+.world-combat-dialog > .l-dialog-container .right-column .title-empty-label {
+  top: 10rem;
+  bottom: 2rem;
+  width: 100%;
+  position: relative;
+  float: left;
+  clear: left;
+
+  text-align: center;
+}
+
+.world-combat-dialog > .l-dialog-container .right-column .entity-div {
+  position: relative;
+  height: 4.5rem;
+}
+
+.world-combat-dialog > .l-dialog-container .right-column .entity-overlay {
+  position: relative;
+  left: 3rem;
+  top: -2rem;
+}
+
+.world-combat-dialog > .l-dialog-container .right-column .entity-label {
+  width: 100%;
+  position: relative;
+  float: left;
+
+  text-align: left;
+}
+
+.world-combat-dialog > .l-dialog-container .right-column .entity-table {
+  top: 0rem;
+  position: relative;
+
+  margin-left: auto;
+  margin-right: auto;
+  vertical-align: middle;
+}
+
+.world-combat-dialog > .l-dialog-container .footer .l-button-bar {
+  top: 0;
+  left: 2rem;
+  right: 2rem;
+  bottom: 0;
+  height: 4.3rem;
+  position: absolute;
+  margin: auto;
+}
+
+.world-combat-dialog > .l-dialog-container .footer .l-cancel-button {
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 17.5rem;
+  position: absolute;
+
+  line-height: 3rem;
+}
+
+.world-combat-dialog > .l-dialog-container .footer .l-defend-button {
+  width: 17.5rem;
+  line-height: 3rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.world-combat-dialog > .l-dialog-container .footer .l-engage-button {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 17.5rem;
+  position: absolute;
+
+  line-height: 3rem;
+}
