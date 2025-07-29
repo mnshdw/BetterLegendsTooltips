@@ -137,20 +137,20 @@ WorldCombatDialog.prototype.loadFromData = function (_data)
 		rightColumn.append(entityListContainer);
 
 		// Create the list with custom scrollbar
-		var entityList = entityListContainer.createList(6, null, false);
+		var entityList = entityListContainer.createList(2, null, false);
 		var scrollContainer = entityList.findListScrollContainer();
 
 		// Create the table inside the scroll container (keeping original styling)
 		var table = '<table class="entity-table" width="70%">';
 
-		for(var i = 0; i < entities.length; ++i)
-		{
-            table += '<tr><td width="10%"><div class="entity-div"><img src="' + Path.GFX + 'ui/orientation/' + entities[i]['Icon'] + '.png" />';
+		for (var i = 0; i < entities.length; ++i) {
+			table += '<tr><td width="10%"><div class="entity-div"><img src="' + Path.GFX +  "ui/orientation/" + entities[i]["Icon"] + '.png" />';
 
-            if(entities[i]['Overlay'] != null)
-                table += '<img src="' + Path.GFX + 'ui/' + entities[i]['Overlay'] + '" class="entity-overlay"/>';
+			if (entities[i]["Overlay"] != null) {
+				table += '<img src="' + Path.GFX + "ui/" + entities[i]["Overlay"] + '" class="entity-overlay" />';
+			}
 
-            table += '</div></td > <td width="5%"/> <td width="85%" class="entity-label text-font-medium font-color-description">' + entities[i]['Name'] + '</td></tr >';
+			table += '</div></td > <td width="5%"/> <td width="85%" class="entity-label text-font-medium font-color-description">' + entities[i]["Name"] + "</td></tr >";
 		}
 
 		table += '</table>';

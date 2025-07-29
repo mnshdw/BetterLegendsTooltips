@@ -30,8 +30,8 @@
 			function(entry) { return entry.icon; },
 			function(entry) { return entry.text; },
 			function(entry, newText) { entry.text = newText; },
-			function(entry) { return "icon" in entry && typeof entry.icon == "string"; },
-			true
+			null, // Use default quantifier-based champion detection for tooltips
+			true  // Use color formatting for tooltips
 		);
 
 		// Build new tooltip with processed entries and non-text entries
@@ -74,7 +74,7 @@
 		);
 	}
 
-	function processEntityGroup(entities, getIcon, getName, setName, isChampionFn, useColorFormatting = true) {
+	function processEntityGroup(entities, getIcon, getName, setName, championDetectionFn = null, useColorFormatting = true) {
 
 		// Usually ennemy troops have a "quantifier" prefix that indicates how many of them are there.
 		// Depending on Legends setting "Exact engagement numbers", this prefix can be a number or a word,
@@ -86,7 +86,7 @@
 
 		// First create a list of all quantifier prefixes
 		local quantifiers = ["A ", "An "];
-		foreach(key, value in ::Const.Strings.EngageEnemyNumbersNames) {
+		foreach (key, value in ::Const.Strings.EngageEnemyNumbersNames) {
 			quantifiers.push(value + " ");
 		}
 
@@ -100,8 +100,6 @@
 		foreach(index, entity in entities) {
 			local icon = getIcon(entity);
 			local baseName = getName(entity);
-
-			::logInfo("Processing entity: baseName=" + (baseName != null ? icon : "null") + " icon=" + (icon != null ? icon : "null"));
 
 			if (icon != null && baseName != null) {
 				local isChampion = false;
@@ -141,11 +139,16 @@
 					}
 				}
 
-				// Override champion detection if provided (but only for merging logic)
-				local shouldMergeNames = ::ModBetterLegendsTooltips.MergeNamedEnemies && isChampionFn(entity);
+				// Special case: Fortifications is terrain information, never a champion
+				if (baseName == "Fortifications") {
+					isChampion = false;
+				} else if (championDetectionFn != null) {
+					// World combat dialog can detect champions by checking the Overlay field
+					isChampion = championDetectionFn(entity);
+				}
 
-				// If MergeNamedEnemies is enabled, try to determine the base name of the entity
-				if (::ModBetterLegendsTooltips.MergeNamedEnemies && (isChampion || shouldMergeNames)) {
+				// If MergeNamedEnemies is enabled and this is a champion, try to determine the base name of the entity
+				if (::ModBetterLegendsTooltips.MergeNamedEnemies && isChampion) {
 					local iconName = icon;
 
 					// Extract the entity ID from the icon path
@@ -182,13 +185,15 @@
 					local entityIndex = ::Const.EntityIcon.find(iconName);
 					if (entityIndex != null && entityIndex in ::Const.Strings.EntityName) {
 						baseName = ::Const.Strings.EntityName[entityIndex];
-						setName(entity, baseName);
+						// For champions, replace the name (eg. "Sir Geofram") with the base name (eg. "Sellsword")
+						if (isChampion) {
+							setName(entity, baseName);
+						}
 					}
 				}
 
 				// Group by icon and base name
 				local key = icon + "|" + baseName + "|" + (isChampion ? "champion" : "normal");
-				::logInfo("key=" + key);
 				if (key in groupedEntities) {
 					groupedEntities[key].count++;
 				} else {
@@ -223,12 +228,24 @@
 
 		// Sort the entries by icon and ensure non-champions come before champions
 		result.sort(function(a, b) {
+			local nameA = getName(a);
+			local nameB = getName(b);
+
+			// Fortifications always comes first
+			if (nameA == "Fortifications" && nameB != "Fortifications") {
+				return -1;
+			}
+			if (nameB == "Fortifications" && nameA != "Fortifications") {
+				return 1;
+			}
+			if (nameA == "Fortifications" && nameB == "Fortifications") {
+				return 0;
+			}
+
 			local iconA = getIcon(a);
 			local iconB = getIcon(b);
 			if (iconA != null && iconB != null) {
 				if (iconA == iconB) {
-					local nameA = getName(a);
-					local nameB = getName(b);
 					local aIsChampion = nameA.find("Champion[/color]") != null || nameA.find("Champion ") != null;
 					local bIsChampion = nameB.find("Champion[/color]") != null || nameB.find("Champion ") != null;
 					return aIsChampion && !bIsChampion ? 1 : (!aIsChampion && bIsChampion ? -1 : 0);
@@ -237,10 +254,6 @@
 			}
 			return 0;
 		});
-
-		for (local i = 0; i < result.len(); i++) {
-			::logInfo("Result entity " + i + ": " + getName(result[i]) + " (" + getIcon(result[i]) + ")");
-		}
 
 		return result;
 	}
