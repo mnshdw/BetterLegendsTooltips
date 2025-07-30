@@ -1,7 +1,7 @@
 ::ModBetterLegendsTooltips <- {
 	ID = "mod_better_legends_tooltips",
 	Name = "Better Legends Tooltips",
-	Version = "1.0.1",
+	Version = "1.0.2",
 	Enabled = true,
 	MergeNamedEnemies = false,
 };
