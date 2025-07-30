@@ -114,7 +114,7 @@ WorldCombatDialog.prototype.loadFromData = function (_data)
 	    imageLayer.createImage(Path.GFX + 'ui/' + _data.Image, null, null, 'display-block terrain-image');
 	}*/
 
-    var rightColumn = $('<div class="right-column "/>');
+    var rightColumn = $('<div class="right-column" />');
     this.mContentContainer.append(rightColumn);
 
     if (_data.Image !== null)
@@ -133,12 +133,23 @@ WorldCombatDialog.prototype.loadFromData = function (_data)
 		rightColumn.append(titleLabel);
 
 		// Create a container for the scrollable entity list
-		var entityListContainer = $('<div class="entity-list-container"/>');
+		var entityListContainer = $('<div class="entity-list-container" style="width: 100%; height: 38rem;" />');
 		rightColumn.append(entityListContainer);
 
-		// Create the list with custom scrollbar
-		var entityList = entityListContainer.createList(2, null, false);
-		var scrollContainer = entityList.findListScrollContainer();
+		var entityList = $('<div class="ui-control list" style="width: 48rem; height: 38rem;"/>');
+		var scrollContainer = $('<div class="scroll-container" />');
+		entityList.append(scrollContainer);
+		entityListContainer.append(entityList);
+		entityList.aciScrollBar({
+			delta: 2,
+			lineDelay: 0,
+			lineTimer: 0,
+			pageDelay: 0,
+			pageTimer: 0,
+			bindKeyboard: false,
+			resizable: false,
+			smoothScroll: false
+		});
 
 		// Create the table inside the scroll container (keeping original styling)
 		var table = '<table class="entity-table" width="70%">';
